@@ -173,7 +173,6 @@ namespace StudentExercises.Controllers
         public ActionResult Edit(int id)
         {
             var instructor = GetInstructorById(id);
-            var cohortOptions = GetCohortOptions();
             var viewModel = new InstructorViewModel()
             {
                 InstructorId = instructor.Id,
@@ -182,7 +181,7 @@ namespace StudentExercises.Controllers
                 SlackHandle = instructor.SlackHandle,
                 Specialty = instructor.Specialty,
                 CohortId = instructor.CohortId,
-                CohortOptions = cohortOptions
+                CohortOptions = GetCohortOptions()
             };
             return View(viewModel);
         }

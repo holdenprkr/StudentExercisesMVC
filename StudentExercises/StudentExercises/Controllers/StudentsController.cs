@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using StudentExercises.Models;
+using StudentExercises.Models.ViewModels;
 
 namespace StudentExercises.Controllers
 {
@@ -121,13 +123,17 @@ namespace StudentExercises.Controllers
         // GET: Students/Create
         public ActionResult Create()
         {
-            return View();
+            var viewModel = new StudentViewModel()
+            {
+                CohortOptions = GetCohortOptions()
+            };
+            return View(viewModel);
         }
 
         // POST: Students/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Student student)
+        public ActionResult Create(StudentViewModel student)
         {
             try
             {
@@ -146,7 +152,7 @@ namespace StudentExercises.Controllers
                         cmd.Parameters.Add(new SqlParameter("@cohortId", student.CohortId));
 
                         var id = (int)cmd.ExecuteScalar();
-                        student.Id = id;
+                        student.StudentId = id;
 
                         return RedirectToAction(nameof(Index));
                     }
@@ -161,13 +167,23 @@ namespace StudentExercises.Controllers
         // GET: Students/Edit/5
         public ActionResult Edit(int id)
         {
-            return View(GetStudentById(id));
+            var student = GetStudentById(id);
+            var viewModel = new StudentViewModel()
+            {
+                StudentId = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                SlackHandle = student.SlackHandle,
+                CohortId = student.CohortId,
+                CohortOptions = GetCohortOptions()
+            };
+            return View(viewModel);
         }
 
         // POST: Students/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Student student)
+        public ActionResult Edit(int id, StudentViewModel student)
         {
             try
             {
@@ -266,6 +282,34 @@ namespace StudentExercises.Controllers
                     }
                     reader.Close();
                     return student;
+                }
+            }
+        }
+
+        private List<SelectListItem> GetCohortOptions()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Name FROM Cohort";
+
+                    var reader = cmd.ExecuteReader();
+                    var options = new List<SelectListItem>();
+
+                    while (reader.Read())
+                    {
+                        var option = new SelectListItem()
+                        {
+                            Text = reader.GetString(reader.GetOrdinal("Name")),
+                            Value = reader.GetInt32(reader.GetOrdinal("Id")).ToString()
+                        };
+
+                        options.Add(option);
+                    }
+                    reader.Close();
+                    return options;
                 }
             }
         }
