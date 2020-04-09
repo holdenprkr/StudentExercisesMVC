@@ -230,14 +230,10 @@ namespace StudentExercises.Controllers
                         cmd.Parameters.Add(new SqlParameter("@cohortId", instructor.CohortId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                        throw new Exception("No rows affected");
+                        cmd.ExecuteNonQuery();
                     }
                 }
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
@@ -301,14 +297,10 @@ namespace StudentExercises.Controllers
                         cmd.CommandText = @"DELETE FROM Instructor WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                        throw new Exception("No rows affected");
+                        cmd.ExecuteNonQuery();
                     }
                 }
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
