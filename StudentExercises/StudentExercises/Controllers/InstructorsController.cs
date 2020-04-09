@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using StudentExercises.Models;
+using StudentExercises.Models.ViewModels;
 
 namespace StudentExercises.Controllers
 {
@@ -125,13 +127,17 @@ namespace StudentExercises.Controllers
         // GET: Instructors/Create
         public ActionResult Create()
         {
-            return View();
+            var viewModel = new InstructorViewModel()
+            {
+                CohortOptions = GetCohortOptions()
+            };
+            return View(viewModel);
         }
 
         // POST: Instructors/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Instructor instructor)
+        public ActionResult Create(InstructorViewModel instructor)
         {
             try
             {
@@ -151,7 +157,7 @@ namespace StudentExercises.Controllers
                         cmd.Parameters.Add(new SqlParameter("@cohortId", instructor.CohortId));
 
                         var id = (int)cmd.ExecuteScalar();
-                        instructor.Id = id;
+                        instructor.InstructorId = id;
 
                         return RedirectToAction(nameof(Index));
                     }
@@ -166,13 +172,25 @@ namespace StudentExercises.Controllers
         // GET: Instructors/Edit/5
         public ActionResult Edit(int id)
         {
-            return View(GetInstructorById(id));
+            var instructor = GetInstructorById(id);
+            var cohortOptions = GetCohortOptions();
+            var viewModel = new InstructorViewModel()
+            {
+                InstructorId = instructor.Id,
+                FirstName = instructor.FirstName,
+                LastName = instructor.LastName,
+                SlackHandle = instructor.SlackHandle,
+                Specialty = instructor.Specialty,
+                CohortId = instructor.CohortId,
+                CohortOptions = cohortOptions
+            };
+            return View(viewModel);
         }
 
         // POST: Instructors/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Instructor instructor)
+        public ActionResult Edit(int id, InstructorViewModel instructor)
         {
             try
             {
@@ -273,6 +291,34 @@ namespace StudentExercises.Controllers
                     }
                     reader.Close();
                     return instructor;
+                }
+            }
+        }
+
+        private List<SelectListItem> GetCohortOptions()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Name FROM Cohort";
+
+                    var reader = cmd.ExecuteReader();
+                    var options = new List<SelectListItem>();
+
+                    while (reader.Read())
+                    {
+                        var option = new SelectListItem()
+                        {
+                            Text = reader.GetString(reader.GetOrdinal("Name")),
+                            Value = reader.GetInt32(reader.GetOrdinal("Id")).ToString()
+                        };
+
+                        options.Add(option);
+                    }
+                    reader.Close();
+                    return options;
                 }
             }
         }

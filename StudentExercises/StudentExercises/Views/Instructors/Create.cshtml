@@ -1,4 +1,4 @@
-﻿@model StudentExercises.Models.Instructor
+﻿@model StudentExercises.Models.ViewModels.InstructorViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -31,8 +31,10 @@
                 <span asp-validation-for="Specialty" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CohortId" class="control-label">Cohort ID</label>
-                <input asp-for="CohortId" class="form-control" />
+                <label asp-for="CohortId" class="control-label">Cohort</label>
+                <select asp-for="CohortId" asp-items="@Model.CohortOptions" class="form-control">
+                    <option value="0" disabled hidden>Please Select a Cohort...</option>
+                </select>
                 <span asp-validation-for="CohortId" class="text-danger"></span>
             </div>
             <div class="form-group">
