@@ -44,8 +44,8 @@ namespace StudentExercises.Controllers
                 i.CohortId,
                 c.[Name] AS CohortName
             FROM Instructor i
-            LEFT JOIN Cohort c ON c.id = i.CohortId
-        ";
+            LEFT JOIN Cohort c ON c.id = i.CohortId";
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Instructor> instructors = new List<Instructor>();
@@ -93,8 +93,8 @@ namespace StudentExercises.Controllers
                 c.[Name] AS CohortName
             FROM Instructor i
             LEFT JOIN Cohort c ON c.id = i.CohortId
-            WHERE i.Id = @id
-        ";
+            WHERE i.Id = @id";
+
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     var reader = cmd.ExecuteReader();
@@ -166,42 +166,7 @@ namespace StudentExercises.Controllers
         // GET: Instructors/Edit/5
         public ActionResult Edit(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-            SELECT Id,
-                FirstName,
-                LastName,
-                SlackHandle,
-                Specialty,
-                CohortId
-            FROM Instructor
-            WHERE Id = @id
-        ";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                    var reader = cmd.ExecuteReader();
-                    Instructor instructor = null;
-
-                    if (reader.Read())
-                    {
-                        instructor = new Instructor
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-                        };
-                    }
-                    reader.Close();
-                    return View(instructor);
-                }
-            }
+            return View(GetInstructorById(id));
         }
 
         // POST: Instructors/Edit/5
@@ -244,48 +209,7 @@ namespace StudentExercises.Controllers
         // GET: Instructors/Delete/5
         public ActionResult Delete(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-            SELECT i.Id,
-                i.FirstName,
-                i.LastName,
-                i.SlackHandle,
-                i.Specialty,
-                i.CohortId,
-                c.[Name] AS CohortName
-            FROM Instructor i
-            LEFT JOIN Cohort c ON c.id = i.CohortId
-            WHERE i.Id = @id
-        ";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                    var reader = cmd.ExecuteReader();
-                    Instructor instructor = null;
-
-                    if (reader.Read())
-                    {
-                        instructor = new Instructor
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                            Cohort = new Cohort()
-                            {
-                                Class = reader.GetString(reader.GetOrdinal("CohortName"))
-                            }
-                        };
-                    }
-                    reader.Close();
-                    return View(instructor);
-                }
-            }
+            return View(GetInstructorById(id));
         }
 
         // POST: Instructors/Delete/5
@@ -311,6 +235,45 @@ namespace StudentExercises.Controllers
             catch
             {
                 return View();
+            }
+        }
+
+        private Instructor GetInstructorById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+            SELECT i.Id, i.FirstName, i.LastName, i.SlackHandle, i.Specialty, i.CohortId, c.[Name] AS CohortName
+            FROM Instructor i
+            LEFT JOIN Cohort c ON c.id = i.CohortId
+            WHERE i.Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    var reader = cmd.ExecuteReader();
+                    Instructor instructor = null;
+
+                    if (reader.Read())
+                    {
+                        instructor = new Instructor
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
+                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
+                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                            Cohort = new Cohort()
+                            {
+                                Class = reader.GetString(reader.GetOrdinal("CohortName"))
+                            }
+                        };
+                    }
+                    reader.Close();
+                    return instructor;
+                }
             }
         }
     }
