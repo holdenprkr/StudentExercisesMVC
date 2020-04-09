@@ -4,8 +4,6 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
-
 <div>
     <h4>Instructor</h4>
     <hr />
@@ -49,6 +47,6 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    <a asp-action="Index">Back to List</a>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-outline-warning btn-sm" }) |
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
 </div>

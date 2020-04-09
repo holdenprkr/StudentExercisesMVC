@@ -4,8 +4,6 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
 <p>
     <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
 </p>
@@ -16,16 +14,16 @@
                 @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                First Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                Last Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SlackHandle)
+                Slack Handle
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Specialty)
+                Specialty
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Cohort.Class)
